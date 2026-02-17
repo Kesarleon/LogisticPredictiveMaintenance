@@ -21,12 +21,6 @@ st.markdown("""
         color: #0e1117;
         font-family: 'Helvetica Neue', sans-serif;
     }
-    .stMetric {
-        background-color: #ffffff;
-        padding: 15px;
-        border-radius: 5px;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -109,7 +103,7 @@ df_filtered = df_current[df_current['Nivel_Riesgo'].isin(risk_filter)]
 
 # --- Main Layout ---
 
-st.title("📊 Dashboard Ejecutivo de Mantenimiento Predictivo")
+st.title("Dashboard Ejecutivo de Mantenimiento Predictivo")
 st.markdown(f"**Fecha de corte:** {current_date.strftime('%Y-%m-%d')}")
 
 # Top KPIs
@@ -167,7 +161,7 @@ with c2:
     st.plotly_chart(fig_pie, use_container_width=True)
 
 # Row 3: Detailed Action Table
-st.subheader("📋 Ranking de Prioridad y Acciones Recomendadas")
+st.subheader("Ranking de Prioridad y Acciones Recomendadas")
 
 # Prepare table for display
 display_cols = [
@@ -196,10 +190,16 @@ st.dataframe(
     hide_index=True
 )
 
+st.markdown("""
+**Definiciones:**
+- **CEI (Costo Esperado de Inacción):** Probabilidad de Falla × Costo Total Estimado de la Falla. Representa el riesgo financiero de no intervenir.
+- **CEM (Costo Estimado de Mantenimiento):** Suma del costo de mantenimiento preventivo y el costo de paro programado.
+""")
+
 st.markdown("---")
 
 # Row 4: Historical Analysis (Drill Down)
-st.subheader("📈 Tendencia Histórica")
+st.subheader("Tendencia Histórica")
 
 selected_unit = st.selectbox("Seleccionar Unidad para ver detalle:", df_history['unit_id'].unique())
 
