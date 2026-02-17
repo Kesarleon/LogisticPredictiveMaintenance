@@ -157,7 +157,7 @@ with c1:
 with c2:
     st.subheader("Distribución de Riesgo")
     risk_counts = df_current['Nivel_Riesgo'].value_counts()
-    fig_pie = px.donut(
+    fig_pie = px.pie(
         names=risk_counts.index,
         values=risk_counts.values,
         color=risk_counts.index,
