@@ -34,7 +34,6 @@ current_date = df_history['fecha'].max()
 df_current = df_history[df_history['fecha'] == current_date].copy()
 
 # Sidebar Settings
-st.sidebar.image("https://cdn-icons-png.flaticon.com/512/1541/1541425.png", width=100) # Generic Icon
 st.sidebar.title("Configuración Financiera")
 st.sidebar.markdown("---")
 
