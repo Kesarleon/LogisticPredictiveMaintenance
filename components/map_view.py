@@ -81,7 +81,7 @@ def render_map_view(df_results, locations_df):
         layers=[layer_routes, layer_locations, layer_units],
         initial_view_state=view_state,
         tooltip=tooltip,
-        map_style="mapbox://styles/mapbox/light-v9"
+        map_style="mapbox://styles/mapbox/streets-v11"
     )
 
     st.pydeck_chart(r)
