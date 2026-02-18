@@ -16,10 +16,10 @@ def render_map_view(df_results, locations_df):
 
     df_results['color'] = df_results['risk_prob'].apply(get_color)
 
-    # Locations: Blue (Station), Purple (Workshop)
+    # Locations: Cyan (Station), Magenta (Workshop) for Satellite Contrast
     def get_loc_color(t):
-        if t == 'Taller': return [128, 0, 128, 200]
-        return [0, 0, 255, 200]
+        if t == 'Taller': return [255, 0, 255, 200] # Magenta
+        return [0, 255, 255, 200] # Cyan
 
     locations_df['color'] = locations_df['type'].apply(get_loc_color)
     locations_df['size'] = locations_df['type'].apply(lambda x: 200 if x == 'Taller' else 100)
@@ -77,11 +77,13 @@ def render_map_view(df_results, locations_df):
         pitch=0,
     )
 
+    # Use a dark style that contrasts with white dashboard and is visible on black dashboard
+    # Using Carto Dark Matter style URL which does not require a Mapbox token
     r = pdk.Deck(
         layers=[layer_routes, layer_locations, layer_units],
         initial_view_state=view_state,
         tooltip=tooltip,
-        map_style="mapbox://styles/mapbox/streets-v11"
+        map_style="https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json"
     )
 
     st.pydeck_chart(r)
@@ -92,7 +94,7 @@ def render_map_view(df_results, locations_df):
         <span>🔴 Unidad Riesgo Alto</span>
         <span>🟠 Unidad Riesgo Medio</span>
         <span>🟢 Unidad Riesgo Bajo</span>
-        <span>🟣 Taller</span>
-        <span>🔵 Estación</span>
+        <span><span style='color: magenta;'>●</span> Taller</span>
+        <span><span style='color: cyan;'>●</span> Estación</span>
     </div>
     """, unsafe_allow_html=True)
