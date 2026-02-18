@@ -4,6 +4,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 import numpy as np
 from data_generator import generate_historical_data, get_locations_data, assign_unit_locations
+from tabs.optimizacion_vrp import render_optimization_tab
 
 # Configuration
 st.set_page_config(
@@ -116,7 +117,7 @@ st.title("Dashboard Ejecutivo de Mantenimiento Predictivo")
 st.markdown(f"**Fecha de corte:** {current_date.strftime('%Y-%m-%d')}")
 
 # Create Tabs
-tab1, tab2 = st.tabs(["Visión General", "Logística y Ruteo"])
+tab1, tab2 = st.tabs(["Visión General", "🗺️ Optimización Inteligente de Unidades (VRP)"])
 
 # --- TAB 1: General Dashboard ---
 with tab1:
@@ -238,173 +239,12 @@ with tab1:
         st.plotly_chart(fig_sensors, use_container_width=True)
 
 
-# --- TAB 2: Logistics & Routing ---
+# --- TAB 2: VRP Optimization ---
 with tab2:
-    st.header("Planificación de Rutas y Gestión de Talleres")
-    st.markdown("Visualización de la flota y asignación óptima a Talleres (Riesgo Alto) o Estaciones de Carga (Operación Normal).")
-
-    # Merge Location Data with Risk Data
-    # unit_locations_df has [unit_id, lat, lon]
-    # df_current has [unit_id, Nivel_Riesgo, probabilidad_falla, etc.]
-
-    df_map = pd.merge(unit_locations_df, df_current[['unit_id', 'Nivel_Riesgo', 'probabilidad_falla', 'Accion_Sugerida']], on='unit_id')
-
-    # Haversine Distance Helper
-    def haversine_np(lon1, lat1, lon2, lat2):
-        """
-        Calculate the great circle distance between two points
-        on the earth (specified in decimal degrees)
-        """
-        lon1, lat1, lon2, lat2 = map(np.radians, [lon1, lat1, lon2, lat2])
-        dlon = lon2 - lon1
-        dlat = lat2 - lat1
-        a = np.sin(dlat/2.0)**2 + np.cos(lat1) * np.cos(lat2) * np.sin(dlon/2.0)**2
-        c = 2 * np.arcsin(np.sqrt(a))
-        km = 6367 * c
-        return km
-
-    # Calculate Optimal Destination
-    results = []
-
-    # Separate locations by type
-    workshops = locations_df[locations_df['type'] == 'Taller']
-    stations = locations_df[locations_df['type'] == 'Estación']
-
-    for index, row in df_map.iterrows():
-        u_lat = row['lat']
-        u_lon = row['lon']
-        risk = row['Nivel_Riesgo']
-
-        # Determine target list based on risk
-        if risk == 'Alto':
-            targets = workshops
-            target_type_str = "Taller (Reparación Urgente)"
-        else:
-            targets = stations
-            target_type_str = "Estación (Carga/Descarga)"
-
-        # Calculate distances to all relevant targets
-        # We use numpy broadcasting for efficiency if lists were huge, but iteration is fine here
-        distances = []
-        for _, t_row in targets.iterrows():
-            dist = haversine_np(u_lon, u_lat, t_row['lon'], t_row['lat'])
-            distances.append((t_row['name'], t_row['lat'], t_row['lon'], dist))
-
-        # Find min distance
-        best_target = min(distances, key=lambda x: x[3])
-
-        results.append({
-            "unit_id": row['unit_id'],
-            "lat_origin": u_lat,
-            "lon_origin": u_lon,
-            "risk": risk,
-            "target_name": best_target[0],
-            "lat_dest": best_target[1],
-            "lon_dest": best_target[2],
-            "distance_km": best_target[3],
-            "action_type": target_type_str
-        })
-
-    df_routes = pd.DataFrame(results)
-
-    # --- MAP VISUALIZATION ---
-
-    # We will use graph_objects to layer scatter plots and lines
-    fig_map = go.Figure()
-
-    # 1. Plot Stations and Workshops
-    fig_map.add_trace(go.Scattermapbox(
-        lat=locations_df['lat'],
-        lon=locations_df['lon'],
-        mode='markers+text',
-        marker=go.scattermapbox.Marker(
-            size=15,
-            color=['red' if t == 'Taller' else 'blue' for t in locations_df['type']],
-            opacity=0.8
-        ),
-        text=locations_df['name'],
-        textposition="bottom center",
-        name="Puntos de Interés"
-    ))
-
-    # 2. Plot Units
-    # Color by risk
-    colors = {"Alto": "red", "Medio": "orange", "Bajo": "green"}
-    for risk_cat in ["Alto", "Medio", "Bajo"]:
-        subset = df_routes[df_routes['risk'] == risk_cat]
-        if not subset.empty:
-            fig_map.add_trace(go.Scattermapbox(
-                lat=subset['lat_origin'],
-                lon=subset['lon_origin'],
-                mode='markers',
-                marker=go.scattermapbox.Marker(
-                    size=10,
-                    color=colors[risk_cat]
-                ),
-                text=subset['unit_id'],
-                name=f"Unidades - {risk_cat}"
-            ))
-
-    # 3. Draw Lines for High Risk Units (Priority Routing)
-    high_risk_routes = df_routes[df_routes['risk'] == 'Alto']
-    for index, row in high_risk_routes.iterrows():
-        fig_map.add_trace(go.Scattermapbox(
-            mode="lines",
-            lon=[row['lon_origin'], row['lon_dest']],
-            lat=[row['lat_origin'], row['lat_dest']],
-            line=dict(width=2, color='red'),
-            showlegend=False,
-            hoverinfo='skip'
-        ))
-
-    # Map Layout
-    fig_map.update_layout(
-        mapbox_style="open-street-map", # Free, no token needed
-        mapbox=dict(
-            center=dict(lat=23.6345, lon=-102.5528), # Center of Mexico
-            zoom=4
-        ),
-        margin={"r":0,"t":0,"l":0,"b":0},
-        height=600,
-        legend=dict(
-            yanchor="top",
-            y=0.99,
-            xanchor="left",
-            x=0.01
-        )
-    )
-
-    st.plotly_chart(fig_map, use_container_width=True)
-
-    # --- ROUTING TABLE ---
-    st.subheader("Detalle de Asignaciones de Ruta")
-
-    # Filter controls
-    show_all = st.checkbox("Mostrar todas las unidades (Desmarcar para ver solo críticas)", value=True)
-
-    table_view = df_routes.copy()
-    if not show_all:
-        table_view = table_view[table_view['risk'] == 'Alto']
-
-    table_view = table_view[['unit_id', 'risk', 'target_name', 'action_type', 'distance_km']]
-    table_view = table_view.sort_values(by=['risk', 'distance_km'], ascending=[True, True]) # Alto sorts before Bajo usually? No, Alto is 'Alto'.
-    # Let's sort manually
-    risk_order = {'Alto': 0, 'Medio': 1, 'Bajo': 2}
-    table_view['risk_sort'] = table_view['risk'].map(risk_order)
-    table_view = table_view.sort_values(by=['risk_sort', 'distance_km']).drop('risk_sort', axis=1)
-
-    # Formatting
-    table_view['distance_km'] = table_view['distance_km'].map('{:.1f} km'.format)
-    table_view.columns = ['Unidad', 'Nivel Riesgo', 'Destino Asignado', 'Tipo de Acción', 'Distancia']
-
-    def highlight_high_risk(s):
-        return ['background-color: #ffcccc' if s['Nivel Riesgo'] == 'Alto' else '' for v in s]
-
-    st.dataframe(
-        table_view.style.apply(highlight_high_risk, axis=1),
-        use_container_width=True,
-        hide_index=True
-    )
+    # Ensure current data has location info
+    # We merge unit locations here before passing to tab renderer
+    df_opt = pd.merge(df_current, unit_locations_df, on='unit_id', how='left')
+    render_optimization_tab(df_opt)
 
 # Footer
 st.markdown("""

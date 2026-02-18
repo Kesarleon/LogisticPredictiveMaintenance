@@ -109,18 +109,18 @@ def get_locations_data():
     """
     locations = [
         # Major Hubs (Stations + Workshops potential)
-        {"id": "LOC-001", "name": "CDMX Central", "lat": 19.4326, "lon": -99.1332, "type": "Taller"},
-        {"id": "LOC-002", "name": "Guadalajara Hub", "lat": 20.6597, "lon": -103.3496, "type": "Taller"},
-        {"id": "LOC-003", "name": "Monterrey North", "lat": 25.6866, "lon": -100.3161, "type": "Taller"},
-        {"id": "LOC-004", "name": "Veracruz Port", "lat": 19.1738, "lon": -96.1342, "type": "Estación"},
-        {"id": "LOC-005", "name": "Tijuana Border", "lat": 32.5149, "lon": -117.0382, "type": "Estación"},
-        {"id": "LOC-006", "name": "Cancun Logistics", "lat": 21.1619, "lon": -86.8515, "type": "Estación"},
-        {"id": "LOC-007", "name": "Puebla Ind.", "lat": 19.0414, "lon": -98.2063, "type": "Estación"},
-        {"id": "LOC-008", "name": "Querétaro Hub", "lat": 20.5888, "lon": -100.3899, "type": "Taller"},
-        {"id": "LOC-009", "name": "León Bajío", "lat": 21.1221, "lon": -101.6664, "type": "Estación"},
-        {"id": "LOC-010", "name": "Mérida South", "lat": 20.9674, "lon": -89.5926, "type": "Estación"},
-        {"id": "LOC-011", "name": "San Luis Potosí", "lat": 22.1565, "lon": -100.9855, "type": "Estación"},
-        {"id": "LOC-012", "name": "Hermosillo", "lat": 29.0729, "lon": -110.9559, "type": "Taller"},
+        {"id": "LOC-001", "name": "CDMX Central", "lat": 19.4326, "lon": -99.1332, "type": "Taller", "capacidad": 5},
+        {"id": "LOC-002", "name": "Guadalajara Hub", "lat": 20.6597, "lon": -103.3496, "type": "Taller", "capacidad": 4},
+        {"id": "LOC-003", "name": "Monterrey North", "lat": 25.6866, "lon": -100.3161, "type": "Taller", "capacidad": 6},
+        {"id": "LOC-004", "name": "Veracruz Port", "lat": 19.1738, "lon": -96.1342, "type": "Estación", "capacidad": 10},
+        {"id": "LOC-005", "name": "Tijuana Border", "lat": 32.5149, "lon": -117.0382, "type": "Estación", "capacidad": 8},
+        {"id": "LOC-006", "name": "Cancun Logistics", "lat": 21.1619, "lon": -86.8515, "type": "Estación", "capacidad": 5},
+        {"id": "LOC-007", "name": "Puebla Ind.", "lat": 19.0414, "lon": -98.2063, "type": "Estación", "capacidad": 12},
+        {"id": "LOC-008", "name": "Querétaro Hub", "lat": 20.5888, "lon": -100.3899, "type": "Taller", "capacidad": 4},
+        {"id": "LOC-009", "name": "León Bajío", "lat": 21.1221, "lon": -101.6664, "type": "Estación", "capacidad": 10},
+        {"id": "LOC-010", "name": "Mérida South", "lat": 20.9674, "lon": -89.5926, "type": "Estación", "capacidad": 6},
+        {"id": "LOC-011", "name": "San Luis Potosí", "lat": 22.1565, "lon": -100.9855, "type": "Estación", "capacidad": 8},
+        {"id": "LOC-012", "name": "Hermosillo", "lat": 29.0729, "lon": -110.9559, "type": "Taller", "capacidad": 3},
     ]
     return pd.DataFrame(locations)
 
