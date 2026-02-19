@@ -12,7 +12,7 @@ def render_fleet_intelligence(df_current: pd.DataFrame):
     st.header("Inteligencia de Flota y Optimización Logística")
 
     # Tabs for different levels of analysis
-    tab_overview, tab_optimization = st.tabs(["🗺️ Mapa General de Flota", "⚙️ Optimización de Rutas (VRP)"])
+    tab_overview, tab_optimization = st.tabs(["Mapa General de Flota", "Optimización de Rutas (VRP)"])
 
     # Load shared data
     locations_df = load_fixed_locations()
@@ -61,7 +61,7 @@ def render_fleet_intelligence(df_current: pd.DataFrame):
         st.caption("Algoritmo de optimización que balancea: Costo de Transporte vs. Riesgo de Falla vs. Capacidad de Talleres.")
 
         # Simulation Controls
-        with st.expander("⚙️ Parámetros de Simulación", expanded=True):
+        with st.expander("Parámetros de Simulación", expanded=True):
             col_s1, col_s2, col_s3 = st.columns(3)
 
             with col_s1:
@@ -77,7 +77,7 @@ def render_fleet_intelligence(df_current: pd.DataFrame):
             with col_s3:
                 use_capacity = st.checkbox("Respetar Capacidad de Talleres", value=True)
 
-            run_opt = st.button("🚀 Ejecutar Optimización", type="primary")
+            run_opt = st.button("Ejecutar Optimización", type="primary")
 
         if run_opt:
             with st.spinner("Calculando rutas óptimas con Google OR-Tools..."):

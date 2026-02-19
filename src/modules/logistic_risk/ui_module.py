@@ -31,15 +31,15 @@ def render_logistic_risk_engine():
             engine.generate_simulated_data()
 
         route_options = list(engine.current_data.keys())
-        selected_route = st.selectbox("📍 Seleccionar Ruta", route_options, index=0)
+        selected_route = st.selectbox("Seleccionar Ruta", route_options, index=0)
 
     with col_ctrl_2:
         # Hour Selector
-        selected_hour = st.slider("🕒 Hora de Salida", 0, 23, 8)
+        selected_hour = st.slider("Hora de Salida", 0, 23, 8)
 
     with col_ctrl_3:
         # Weight Configuration
-        with st.expander("⚖️ Calibración de Pesos (Modelo Matemático)"):
+        with st.expander("Calibración de Pesos (Modelo Matemático)"):
             c1, c2 = st.columns(2)
             with c1:
                 w_traffic = st.slider("Tráfico", 0.0, 1.0, 0.4, 0.1)
@@ -100,7 +100,7 @@ def render_logistic_risk_engine():
 
         st.plotly_chart(fig_curve, use_container_width=True)
 
-        if st.button("✨ Simular Mejor Ventana Operativa"):
+        if st.button("Simular Mejor Ventana Operativa"):
              st.success(f"La ventana óptima de salida es a las **{best_hour}:00** horas. Reducción de riesgo estimada: **{(1 - (analysis_res['min_risk_index']/risk_data['composite_risk_index'])):.1%}** respecto a la hora actual.")
 
     with c2:
@@ -248,7 +248,7 @@ def render_logistic_risk_engine():
 
 
     # --- Footer / Professional Touch ---
-    with st.expander("ℹ️ Detalles Técnicos y Supuestos del Modelo"):
+    with st.expander("Detalles Técnicos y Supuestos del Modelo"):
         st.markdown("""
         **Metodología:**
         El motor de riesgo utiliza una arquitectura hexagonal ligera. Los cálculos se basan en una suma ponderada de factores normalizados:

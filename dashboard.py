@@ -59,10 +59,10 @@ st.sidebar.title("Navegación")
 selection = st.sidebar.radio(
     "Ir a:",
     [
-        "📊 Resumen Ejecutivo",
-        "🚛 Inteligencia de Flota",
-        "🔧 Diagnóstico de Activos",
-        "⚠️ Motor de Riesgo Logístico"
+        "Resumen Ejecutivo",
+        "Inteligencia de Flota",
+        "Diagnóstico de Activos",
+        "Motor de Riesgo Logístico"
     ]
 )
 
@@ -77,16 +77,16 @@ st.sidebar.info(
 
 # --- 5. Main Content Routing ---
 
-if selection == "📊 Resumen Ejecutivo":
+if selection == "Resumen Ejecutivo":
     render_executive_summary(df_current)
 
-elif selection == "🚛 Inteligencia de Flota":
+elif selection == "Inteligencia de Flota":
     render_fleet_intelligence(df_current)
 
-elif selection == "🔧 Diagnóstico de Activos":
+elif selection == "Diagnóstico de Activos":
     render_asset_diagnostics(df_current)
 
-elif selection == "⚠️ Motor de Riesgo Logístico":
+elif selection == "Motor de Riesgo Logístico":
     render_risk_view(df_current)
 
 # --- Footer ---
