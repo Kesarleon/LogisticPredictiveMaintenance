@@ -31,8 +31,20 @@ def apply_custom_styles():
 
         /* Sidebar styling */
         section[data-testid="stSidebar"] {
-            background-color: #ffffff;
+            background-color: #262730;
             border-right: 1px solid #e0e0e0;
+        }
+
+        /* Ensure text in sidebar is white for contrast */
+        section[data-testid="stSidebar"] h1,
+        section[data-testid="stSidebar"] h2,
+        section[data-testid="stSidebar"] h3,
+        section[data-testid="stSidebar"] label,
+        section[data-testid="stSidebar"] .stRadio label,
+        section[data-testid="stSidebar"] .stMarkdown p,
+        section[data-testid="stSidebar"] .stMarkdown li,
+        section[data-testid="stSidebar"] div[data-testid="stMarkdownContainer"] p {
+            color: #ffffff !important;
         }
 
         /* Metric Styling - Clean & Minimal */

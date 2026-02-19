@@ -68,7 +68,7 @@ def render_asset_diagnostics(df_current: pd.DataFrame):
         st.plotly_chart(fig_sensors, use_container_width=True)
 
     # Technical Specs / Maintenance Log Placeholder
-    with st.expander("📋 Ficha Técnica y Bitácora de Mantenimiento", expanded=False):
+    with st.expander("Ficha Técnica y Bitácora de Mantenimiento", expanded=False):
         col_t1, col_t2 = st.columns(2)
         with col_t1:
             st.markdown(f"""
