@@ -5,6 +5,7 @@ import plotly.graph_objects as go
 import numpy as np
 from data_generator import generate_historical_data, get_locations_data, assign_unit_locations
 from tabs.optimizacion_vrp import render_optimization_tab
+from logistic_risk_engine.ui_module import render_logistic_risk_engine
 
 # Configuration
 st.set_page_config(
@@ -117,7 +118,7 @@ st.title("Dashboard Ejecutivo de Mantenimiento Predictivo")
 st.markdown(f"**Fecha de corte:** {current_date.strftime('%Y-%m-%d')}")
 
 # Create Tabs
-tab1, tab2 = st.tabs(["Visión General", "🗺️ Optimización Inteligente de Unidades (VRP)"])
+tab1, tab2, tab3 = st.tabs(["Visión General", "🗺️ Optimización Inteligente de Unidades (VRP)", "Motor Predictivo de Riesgo Logístico"])
 
 # --- TAB 1: General Dashboard ---
 with tab1:
@@ -245,6 +246,10 @@ with tab2:
     # We merge unit locations here before passing to tab renderer
     df_opt = pd.merge(df_current, unit_locations_df, on='unit_id', how='left')
     render_optimization_tab(df_opt)
+
+# --- TAB 3: Logistic Risk Engine ---
+with tab3:
+    render_logistic_risk_engine()
 
 # Footer
 st.markdown("""
