@@ -171,6 +171,82 @@ def render_logistic_risk_engine():
                           text_auto='.2f')
         st.plotly_chart(fig_comp, use_container_width=True)
 
+    # --- Map Section ---
+    st.markdown("---")
+    st.subheader("Mapa de Riesgo por Segmento")
+
+    col_map_1, col_map_2 = st.columns([1, 3])
+
+    with col_map_1:
+        st.markdown("**Configuración del Mapa**")
+        map_risk_factor = st.radio(
+            "Factor de Riesgo a Visualizar",
+            options=["Riesgo Total", "Tráfico", "Accidentabilidad", "Retenes", "Clima"],
+            index=0
+        )
+
+        factor_map = {
+            "Riesgo Total": "risk_score",
+            "Tráfico": "traffic_risk",
+            "Accidentabilidad": "accident_risk",
+            "Retenes": "reten_risk",
+            "Clima": "climate_risk"
+        }
+
+        selected_factor_col = factor_map[map_risk_factor]
+
+        st.caption("Los segmentos se colorean de Verde (Bajo) a Rojo (Alto) según la intensidad del factor seleccionado.")
+
+    with col_map_2:
+        import pydeck as pdk
+
+        # Prepare data for PyDeck
+        # risk_data['details'] has start_lat, start_lon, end_lat, end_lon
+        df_map = risk_data['details'].copy()
+
+        # Color function
+        # We need a list of [r, g, b] for each row
+        def get_color(val):
+            # Normalize 0-1 just in case
+            val = max(0, min(1, val))
+            # Green to Red interpolation
+            # Low risk (0): Green (0, 255, 0)
+            # High risk (1): Red (255, 0, 0)
+            return [int(val * 255), int((1 - val) * 255), 0]
+
+        df_map['color'] = df_map[selected_factor_col].apply(get_color)
+
+        # Create PathLayer data
+        # PathLayer expects a path field: [[lon, lat], [lon, lat]]
+        df_map['path'] = df_map.apply(lambda row: [[row['start_lon'], row['start_lat']], [row['end_lon'], row['end_lat']]], axis=1)
+
+        # Center the map
+        initial_view_state = pdk.ViewState(
+            latitude=df_map['start_lat'].mean(),
+            longitude=df_map['start_lon'].mean(),
+            zoom=10,
+            pitch=0,
+        )
+
+        layer = pdk.Layer(
+            "PathLayer",
+            df_map,
+            pickable=True,
+            get_color="color",
+            width_scale=20,
+            width_min_pixels=2,
+            get_path="path",
+            get_width=5
+        )
+
+        st.pydeck_chart(pdk.Deck(
+            map_style="https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json",
+            initial_view_state=initial_view_state,
+            layers=[layer],
+            tooltip={"text": "Segmento: {segment_id}\nValor: {" + selected_factor_col + "}"}
+        ))
+
+
     # --- Footer / Professional Touch ---
     with st.expander("ℹ️ Detalles Técnicos y Supuestos del Modelo"):
         st.markdown("""

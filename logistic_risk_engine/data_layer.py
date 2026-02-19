@@ -25,6 +25,10 @@ class LogisticDataLayer:
         routes = ['Ruta Norte-Sur', 'Ruta Este-Oeste']
         data = {}
 
+        # Starting point (Mexico City approximate)
+        base_lat = 19.4326
+        base_lon = -99.1332
+
         for route_name in routes:
             n_segments = 200
             segments = []
@@ -34,10 +38,17 @@ class LogisticDataLayer:
                 # More mountainous/complex
                 base_risk_bias = 0.4
                 climate_impact = 0.7
+                lat_dir = 1.0 # North
+                lon_dir = 0.1 # Slight drift
             else:
                 # Flatter, highway
                 base_risk_bias = 0.2
                 climate_impact = 0.3
+                lat_dir = 0.1 # Slight drift
+                lon_dir = 1.0 # East
+
+            current_lat = base_lat
+            current_lon = base_lon
 
             for i in range(n_segments):
                 # Simulate segment properties
@@ -56,18 +67,41 @@ class LogisticDataLayer:
                 # Climate vulnerability (how much this segment is affected by weather)
                 climate_vulnerability = np.clip(np.random.normal(climate_impact, 0.2), 0, 1)
 
+                distance_km = np.round(np.random.uniform(1.0, 5.0), 2)
+
+                # Estimate coordinate change (very rough approx: 1 deg ~ 111km)
+                d_lat = (distance_km / 111.0) * lat_dir
+                d_lon = (distance_km / 111.0) * lon_dir
+
+                # Add some winding to the road
+                d_lat += np.random.uniform(-0.005, 0.005)
+                d_lon += np.random.uniform(-0.005, 0.005)
+
+                start_lat = current_lat
+                start_lon = current_lon
+                end_lat = current_lat + d_lat
+                end_lon = current_lon + d_lon
+
                 segment = {
                     'segment_id': i,
                     'route_name': route_name,
-                    'distance_km': np.round(np.random.uniform(1.0, 5.0), 2),
+                    'distance_km': distance_km,
                     'base_traffic': base_traffic,
                     'base_accident': base_accident,
                     'is_reten': is_reten,
                     'climate_vulnerability': climate_vulnerability,
                     # Simulated "type" of road for display
-                    'road_type': np.random.choice(['Autopista', 'Carretera', 'Urbano'], p=[0.6, 0.3, 0.1])
+                    'road_type': np.random.choice(['Autopista', 'Carretera', 'Urbano'], p=[0.6, 0.3, 0.1]),
+                    'start_lat': start_lat,
+                    'start_lon': start_lon,
+                    'end_lat': end_lat,
+                    'end_lon': end_lon
                 }
                 segments.append(segment)
+
+                # Update current position for next segment
+                current_lat = end_lat
+                current_lon = end_lon
 
             df = pd.DataFrame(segments)
             data[route_name] = df
